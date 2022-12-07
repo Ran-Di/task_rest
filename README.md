@@ -1,2 +1,2 @@
 # task_REST
-task for release REST API with Go
+test task for create REST API with Go
