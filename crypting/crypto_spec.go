@@ -3,6 +3,7 @@ package crypting
 import (
 	"strconv"
 	"strings"
+	"task_rest/middleware"
 )
 
 type symbol struct {
@@ -10,10 +11,12 @@ type symbol struct {
 	count int
 }
 
-// Crypt function for crypting string
+// Encrypt function for crypting string
 // input "AAABBACACACAC"
 // output "3A2B4(AC)"
-func Crypt(str string) (result string) {
+func Encrypt(str string) (result string) {
+	middleware.Logs.Debug().Msgf("[crypting] Encrypt started")
+	middleware.Logs.Debug().Str("value str=", str).Msgf("[crypting]")
 	numRep, num := []symbol{{st: string(str[0]), count: 0}}, 0
 	for _, char := range str {
 		if numRep[num].st == string(char) {
@@ -23,6 +26,7 @@ func Crypt(str string) (result string) {
 			num++
 		}
 	}
+	middleware.Logs.Debug().Interface("disassemble str=", numRep).Msgf("[crypting] Encrypt: second loop for build str")
 	num = 2
 	checkExit := false
 	for !checkExit {
@@ -73,6 +77,7 @@ func Crypt(str string) (result string) {
 			num++
 		}
 	}
+	middleware.Logs.Debug().Msgf("[crypting] Encrypt: last loop - build result")
 	for i := 0; i < len(numRep); i++ {
 		if numRep[i].count > 1 {
 			result += strconv.Itoa(numRep[i].count)
@@ -83,6 +88,8 @@ func Crypt(str string) (result string) {
 			result += numRep[i].st
 		}
 	}
+	middleware.Logs.Debug().Str("str=", result).Msgf("[crypting] result")
+	middleware.Logs.Debug().Msgf("[crypting] Encrypt finished")
 	return
 }
 
@@ -90,8 +97,10 @@ func Crypt(str string) (result string) {
 // input "2A3B4(AC)"
 // output "AABBBACACACAC"
 func Decrypt(str string) string {
+	middleware.Logs.Debug().Msgf("[crypting] Decrypt started")
 	var numRep []symbol
 	var newStr, numChar, long, add = "", "", 0, false
+	middleware.Logs.Debug().Str("str=", str).Msgf("[crypting] start loop for disassemble str")
 	for _, char := range str {
 		if strings.ContainsRune("(", char) {
 			if long > 0 {
@@ -123,8 +132,11 @@ func Decrypt(str string) string {
 			newStr, numChar, add = "", "", false
 		}
 	}
+	middleware.Logs.Debug().Msgf("[crypting] Decrypt: last loop - build result")
 	for _, val := range numRep {
 		newStr += strings.Repeat(val.st, val.count)
 	}
+	middleware.Logs.Debug().Str("str=", newStr).Msgf("[crypting] result")
+	middleware.Logs.Debug().Msgf("[crypting] Decrypt finished")
 	return newStr
 }

@@ -14,7 +14,7 @@ func Test_Crypt(t *testing.T) {
 		{"ABBFBBFBBFBBDBBFBBFBBFBBDE", "A2(3(2BF)2BD)E"},
 	}
 	for _, c := range cases {
-		got := Crypt(c.in)
+		got := Encrypt(c.in)
 		if got != c.want {
 			t.Errorf("Crypting: (%q) == %q, want %q", c.in, got, c.want)
 		}
@@ -47,10 +47,10 @@ func Test_All(t *testing.T) {
 		"ABBFBBFBBFBBDBBFBBFBBFBBDE",
 	}
 	for _, c := range cases {
-		got_crypt := Crypt(c)
-		got_decrypt := Decrypt(got_crypt)
-		if got_decrypt != c {
-			t.Errorf("Crypting-Decrypting: (%q) == %q, intermediate line %q", c, got_decrypt, got_crypt)
+		gotCrypt := Encrypt(c)
+		gotDecrypt := Decrypt(gotCrypt)
+		if gotDecrypt != c {
+			t.Errorf("Crypting-Decrypting: (%q) == %q, intermediate line %q", c, gotDecrypt, gotCrypt)
 		}
 	}
 }

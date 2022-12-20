@@ -1,0 +1,10 @@
+api:
+  host: localhost
+  port: 9000
+sql:
+  host: localhost
+  port: 5432
+  user: user
+  password: u000000
+  database: postgres
+  sslmode: disable
