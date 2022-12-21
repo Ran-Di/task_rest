@@ -43,6 +43,29 @@ func init() {
 	middleware.Logs.Debug().Msgf("[http] init finished")
 }
 
+// openRequest function for open and unmarshal json for POST request
+func openRequest(r *http.Request) (body model.Body, err error) {
+	middleware.Logs.Debug().Msgf("[http] openRequest started")
+	req, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		middleware.Logs.Err(err).Msgf("error read [Request]")
+		return
+	} else {
+		middleware.Logs.Info().Msgf("read [Request] is success")
+	}
+	if err = json.Unmarshal(req, &body); err != nil {
+		middleware.Logs.Err(err).Msgf("error Unmarshal json")
+	} else {
+		middleware.Logs.Info().Msgf("Unmarshal json is success")
+	}
+	if body.Decrypt == "" && body.Encrypt == "" {
+		err = errors.New("ERROR, no value")
+		middleware.Logs.Err(err).Msgf("value is empty")
+	}
+	middleware.Logs.Debug().Msgf("[http] openRequest finished")
+	return
+}
+
 // outJson function forms output info in json
 func outJson(w http.ResponseWriter, body any, err error) {
 	var res result
@@ -99,27 +122,10 @@ func (h handler) test(w http.ResponseWriter, r *http.Request) {
 func (h handler) sendEncrypt(w http.ResponseWriter, r *http.Request) {
 	middleware.Logs.Debug().Msgf("[http] sendEncrypt started")
 	defer r.Body.Close()
-	req, err := ioutil.ReadAll(r.Body)
+	body, err := openRequest(r)
 	if err != nil {
-		middleware.Logs.Err(err).Msgf("error read [Request]")
-	} else {
-		middleware.Logs.Info().Msgf("read [Request] is success")
-	}
-
-	var body model.Body
-	if err = json.Unmarshal(req, &body); err != nil {
-		middleware.Logs.Err(err).Msgf("error Unmarshal json")
 		outJson(w, nil, err)
-		middleware.Logs.Debug().Msgf("[http] sendEncrypt exit")
-		return
-	} else {
-		middleware.Logs.Info().Msgf("Unmarshal json is success")
-	}
-
-	if body.Encrypt == "" {
-		err = errors.New("ERROR, no value")
-		middleware.Logs.Err(err).Msgf("value is empty")
-		outJson(w, body.Encrypt, err)
+		middleware.Logs.Debug().Msgf("[http] sendDecrypt exit")
 		return
 	}
 	body.Decrypt = crypting.Encrypt(body.Encrypt)
@@ -136,27 +142,10 @@ func (h handler) sendEncrypt(w http.ResponseWriter, r *http.Request) {
 func (h handler) sendDecrypt(w http.ResponseWriter, r *http.Request) {
 	middleware.Logs.Debug().Msgf("[http] sendDecrypt started")
 	defer r.Body.Close()
-	req, err := ioutil.ReadAll(r.Body)
+	body, err := openRequest(r)
 	if err != nil {
-		middleware.Logs.Err(err).Msgf("error read [Request]")
-	} else {
-		middleware.Logs.Info().Msgf("read [Request] is success")
-	}
-
-	var body model.Body
-	if err = json.Unmarshal(req, &body); err != nil {
-		middleware.Logs.Err(err).Msgf("error Unmarshal json")
 		outJson(w, nil, err)
 		middleware.Logs.Debug().Msgf("[http] sendDecrypt exit")
-		return
-	} else {
-		middleware.Logs.Info().Msgf("Unmarshal json is success")
-	}
-
-	if body.Decrypt == "" {
-		err = errors.New("ERROR, no value")
-		middleware.Logs.Err(err).Msgf("value is empty")
-		outJson(w, body.Decrypt, err)
 		return
 	}
 	body.Encrypt = crypting.Decrypt(body.Decrypt)
