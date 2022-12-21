@@ -17,9 +17,9 @@ type handler struct {
 	db *gorm.DB
 }
 
-type res struct {
-	result any   `json:"result"`
-	err    error `json:"error"`
+type result struct {
+	Result any   `json:"result"`
+	Error  error `json:"error"`
 }
 
 var (
@@ -44,13 +44,19 @@ func init() {
 
 // outJson function forms output info in json
 func outJson(w http.ResponseWriter, body any, err error) {
-	_res := res{result: body, err: err}
-	middleware.Logs.Debug().Interface("any", _res).Msgf("output=")
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if _err := json.NewEncoder(w).Encode(_res); _err != nil {
+	var res result
+	if err != nil {
+		res = result{Result: nil, Error: err}
+	} else {
+		res = result{Result: body, Error: nil}
+	}
+	middleware.Logs.Debug().Interface("any", res).Msgf("output=")
+	w.Header().Set("Content-Type", "application/json")
+	jByte, _err := json.Marshal(res)
+	if _err != nil {
 		middleware.Logs.Err(err).Msgf("[http] json encode failed")
 	}
+	w.Write(jByte)
 	middleware.Logs.Debug().Msgf("[http] json forms end")
 }
 
@@ -72,7 +78,7 @@ func StartNet() {
 func RunNet() {
 	middleware.Logs.Debug().Msgf("[http] RunNet started")
 	adr := ":" + model.ConfigFile.Api.Port
-	middleware.Logs.Info().Msgf("listen http client from: %s", adr)
+	middleware.Logs.Info().Msgf("listen http client from: %s%s", model.ConfigFile.Api.Host, adr)
 	err := http.ListenAndServe(adr, wrapServ) //wrappedMux
 	if err != nil {
 		middleware.Logs.Err(err).Msgf("error listen http client")
@@ -102,7 +108,7 @@ func (h handler) sendEncrypt(w http.ResponseWriter, r *http.Request) {
 	var body model.Body
 	if err = json.Unmarshal(req, &body); err != nil {
 		middleware.Logs.Err(err).Msgf("error Unmarshal json")
-		outJson(w, "", err)
+		outJson(w, nil, err)
 		middleware.Logs.Debug().Msgf("[http] sendEncrypt exit")
 		return
 	} else {
@@ -133,7 +139,7 @@ func (h handler) sendDecrypt(w http.ResponseWriter, r *http.Request) {
 	var body model.Body
 	if err = json.Unmarshal(req, &body); err != nil {
 		middleware.Logs.Err(err).Msgf("error Unmarshal json")
-		outJson(w, "", err)
+		outJson(w, nil, err)
 		middleware.Logs.Debug().Msgf("[http] sendDecrypt exit")
 		return
 	} else {
@@ -160,20 +166,20 @@ func (h handler) sendHistory(w http.ResponseWriter, r *http.Request) {
 	limit, err = strconv.Atoi(strLimit)
 	if err != nil {
 		middleware.Logs.Err(err).Msgf("can't convert value of limit")
-		outJson(w, "", err)
+		outJson(w, nil, err)
 		return
 	}
 	offset, err = strconv.Atoi(strOffset)
 	if err != nil {
 		middleware.Logs.Err(err).Msgf("can't convert value of offset")
-		outJson(w, "", err)
+		outJson(w, nil, err)
 		return
 	}
 
-	result, err := DataBase.Show(h.db, limit, offset)
+	res, err := DataBase.Show(h.db, limit, offset)
 	if err != nil {
 		middleware.Logs.Err(err).Msgf("can't show list from table")
 	}
-	outJson(w, result, err)
+	outJson(w, res, err)
 	middleware.Logs.Debug().Msgf("[http] sendHistory finished")
 }

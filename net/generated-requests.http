@@ -1,0 +1,87 @@
+GET localhost:9000/test
+
+<> 2022-12-21T113145.200.txt
+<> 2022-12-21T095935.200.txt
+<> 2022-12-21T095435.200.txt
+<> 2022-12-20T173926.200.txt
+<> 2022-12-20T172900.200.txt
+
+###
+POST http://localhost:9000/encrypt
+Content-Type: application/json
+
+{
+  "encrypt": "AAABBACACACACADDADDACCDD"
+}
+
+<> 2022-12-21T113339.200.json
+<> 2022-12-21T113154.200.json
+<> 2022-12-21T111349.200.json
+<> 2022-12-21T111036.200.json
+<> 2022-12-21T095831.400.txt
+<> 2022-12-21T095444.400.txt
+<> 2022-12-20T183414.400.txt
+
+###
+POST http://localhost:9000/encrypt
+Content-Type: application/json
+
+{
+  "encrypt": "AAABABABACACCACC"
+}
+
+###
+POST http://localhost:9000/encrypt
+Content-Type: application/json
+
+{
+  "encrypt": "ABBFBBFBBFBBDBBFBBFBBFBBDE"
+}
+
+###
+POST localhost:9000/decrypt
+Content-Type: application/json
+
+{
+  "decrypt":"A2(3(2BF)2BD)E"
+}
+
+<> 2022-12-21T110924.200.json
+<> 2022-12-21T100056.400.txt
+<> 2022-12-21T095612.400.txt
+
+###
+POST localhost:9000/decrypt
+Content-Type: application/json
+
+{
+  "decrypt":"A2(2B3(F2B)D)E"
+}
+
+###
+POST localhost:9000/decrypt
+Content-Type: application/json
+
+{
+  "decrypt":"3A2B4(AC)2(A2D)A2C2D"
+}
+
+###
+GET localhost:9000/history?limit=3&offset=2
+
+<> 2022-12-21T114947.200.json
+<> 2022-12-21T113500.200.json
+<> 2022-12-21T113132.200.json
+<> 2022-12-21T110950.200.json
+<> 2022-12-21T110936.200.json
+<> 2022-12-21T110120.200.json
+<> 2022-12-21T110114.200.json
+<> 2022-12-21T110100.200.json
+<> 2022-12-21T104708.200.json
+<> 2022-12-21T103908.200.json
+<> 2022-12-21T100446.200.json
+<> 2022-12-21T095555.200.json
+<> 2022-12-20T183333.200.json
+<> 2022-12-20T175935.200.json
+
+###
