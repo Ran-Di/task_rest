@@ -39,6 +39,14 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:9000/encrypt
+Content-Type: application/json
+
+{
+  "encrypt": ""
+}
+
+###
 POST localhost:9000/decrypt
 Content-Type: application/json
 
@@ -64,6 +72,14 @@ Content-Type: application/json
 
 {
   "decrypt":"3A2B4(AC)2(A2D)A2C2D"
+}
+
+###
+POST localhost:9000/decrypt
+Content-Type: application/json
+
+{
+  "decrypt":""
 }
 
 ###

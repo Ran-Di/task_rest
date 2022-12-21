@@ -13,8 +13,9 @@ type Body struct {
 
 type Config struct {
 	Api struct {
-		Host string `yaml:"host"`
-		Port string `yaml:"port"`
+		Host      string `yaml:"host"`
+		Port      string `yaml:"port"`
+		DebugMode bool   `yaml:"debug"`
 	} `yaml:"api"`
 
 	Sql struct {
@@ -33,6 +34,10 @@ var (
 )
 
 func init() {
+	ConfigFile = Update()
+}
+
+func Update() (cfg Config) {
 	middleware.Logs.Debug().Msgf("[model] init started")
 	b, err := os.ReadFile("config.yml")
 	if err != nil {
@@ -40,11 +45,16 @@ func init() {
 	} else {
 		middleware.Logs.Info().Msgf("reading config file is success")
 	}
-	err = yaml.Unmarshal(b, &ConfigFile)
+	err = yaml.Unmarshal(b, &cfg)
 	if err != nil {
 		middleware.Logs.Err(err).Msgf("error unmarshal config file")
 	} else {
 		middleware.Logs.Info().Msgf("unmarshal config file is success")
 	}
 	middleware.Logs.Debug().Msgf("[model] init finished")
+	return
+}
+
+func UpdateFile() {
+	ConfigFile = Update()
 }

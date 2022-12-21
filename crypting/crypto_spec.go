@@ -17,6 +17,9 @@ type symbol struct {
 func Encrypt(str string) (result string) {
 	middleware.Logs.Debug().Msgf("[crypting] Encrypt started")
 	middleware.Logs.Debug().Str("value str=", str).Msgf("[crypting]")
+	if str == "" {
+		return ""
+	}
 	numRep, num := []symbol{{st: string(str[0]), count: 0}}, 0
 	for _, char := range str {
 		if numRep[num].st == string(char) {

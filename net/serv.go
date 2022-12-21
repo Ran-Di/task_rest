@@ -2,6 +2,7 @@ package net
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
 	"io/ioutil"
@@ -18,8 +19,8 @@ type handler struct {
 }
 
 type result struct {
-	Result any   `json:"result"`
-	Error  error `json:"error"`
+	Result any `json:"result"`
+	Error  any `json:"error"`
 }
 
 var (
@@ -46,7 +47,7 @@ func init() {
 func outJson(w http.ResponseWriter, body any, err error) {
 	var res result
 	if err != nil {
-		res = result{Result: nil, Error: err}
+		res = result{Result: nil, Error: err.Error()}
 	} else {
 		res = result{Result: body, Error: nil}
 	}
@@ -115,6 +116,12 @@ func (h handler) sendEncrypt(w http.ResponseWriter, r *http.Request) {
 		middleware.Logs.Info().Msgf("Unmarshal json is success")
 	}
 
+	if body.Encrypt == "" {
+		err = errors.New("ERROR, no value")
+		middleware.Logs.Err(err).Msgf("value is empty")
+		outJson(w, body.Encrypt, err)
+		return
+	}
 	body.Decrypt = crypting.Encrypt(body.Encrypt)
 	if err = DataBase.AddRec(h.db, "encrypt", body.Encrypt, body.Decrypt); err != nil {
 		middleware.Logs.Err(err).Msgf("can't add new record in Data Base")
@@ -146,6 +153,12 @@ func (h handler) sendDecrypt(w http.ResponseWriter, r *http.Request) {
 		middleware.Logs.Info().Msgf("Unmarshal json is success")
 	}
 
+	if body.Decrypt == "" {
+		err = errors.New("ERROR, no value")
+		middleware.Logs.Err(err).Msgf("value is empty")
+		outJson(w, body.Decrypt, err)
+		return
+	}
 	body.Encrypt = crypting.Decrypt(body.Decrypt)
 	if err = DataBase.AddRec(h.db, "decrypt", body.Decrypt, body.Encrypt); err != nil {
 		middleware.Logs.Err(err).Msgf("can't add new record in Data Base")

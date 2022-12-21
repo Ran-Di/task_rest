@@ -12,6 +12,7 @@ func Test_Crypt(t *testing.T) {
 		{"AAABBACACACACADDADDACCDD", "3A2B4(AC)2(A2D)A2C2D"},
 		{"AAABABABACACCACC", "3A3(BA)C2(A2C)"},
 		{"ABBFBBFBBFBBDBBFBBFBBFBBDE", "A2(3(2BF)2BD)E"},
+		{"", ""},
 	}
 	for _, c := range cases {
 		got := Encrypt(c.in)
